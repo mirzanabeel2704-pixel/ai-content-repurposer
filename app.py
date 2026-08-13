@@ -1,9 +1,13 @@
 import os
+import re
+import requests
 import streamlit as st
 from groq import Groq
 from dotenv import load_dotenv
 from pypdf import PdfReader
 from docx import Document
+from youtube_transcript_api import YouTubeTranscriptApi
+from bs4 import BeautifulSoup
 
 load_dotenv()
 
@@ -59,26 +63,45 @@ with st.sidebar:
         index=0
     )
 
-# Function to extract text from uploaded files
-def extract_text(uploaded_file):
+# Helper functions to extract content from different sources
+def extract_pdf(uploaded_file):
     text = ""
-    if uploaded_file.type == "application/pdf":
-        reader = PdfReader(uploaded_file)
-        for page in reader.pages:
-            if page.extract_text():
-                text += page.extract_text() + "\n"
-    elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        doc = Document(uploaded_file)
-        for para in doc.paragraphs:
-            text += para.text + "\n"
-    elif uploaded_file.type == "text/plain":
-        text = str(uploaded_file.read(), "utf-8")
+    reader = PdfReader(uploaded_file)
+    for page in reader.pages:
+        if page.extract_text():
+            text += page.extract_text() + "\n"
     return text
+
+def extract_docx(uploaded_file):
+    text = ""
+    doc = Document(uploaded_file)
+    for para in doc.paragraphs:
+        text += para.text + "\n"
+    return text
+
+def extract_youtube_transcript(url):
+    video_id_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
+    if not video_id_match:
+        raise ValueError("Invalid YouTube URL")
+    video_id = video_id_match.group(1)
+    transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
+    return " ".join([item["text"] for item in transcript_list])
+
+def extract_web_article(url):
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, "html.parser")
+    paragraphs = soup.find_all("p")
+    return "\n".join([p.get_text() for p in paragraphs])
 
 # Main UI - Input Section
 st.subheader("1. Input Your Source Content")
 
-input_method = st.radio("Choose input method:", ["✍️ Paste Text", "📁 Upload File (PDF, Word, TXT)"], horizontal=True)
+input_method = st.radio(
+    "Choose input method:",
+    ["✍️ Paste Text", "📁 Upload File", "🔗 YouTube / Blog URL"],
+    horizontal=True
+)
 
 source_text = ""
 
@@ -88,13 +111,34 @@ if input_method == "✍️ Paste Text":
         height=200,
         placeholder="Paste your content here..."
     )
-else:
+elif input_method == "📁 Upload File":
     uploaded_file = st.file_uploader("Upload a document", type=["pdf", "docx", "txt"])
     if uploaded_file is not None:
         with st.spinner("Reading file content..."):
-            source_text = extract_text(uploaded_file)
+            if uploaded_file.type == "application/pdf":
+                source_text = extract_pdf(uploaded_file)
+            elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                source_text = extract_docx(uploaded_file)
+            elif uploaded_file.type == "text/plain":
+                source_text = str(uploaded_file.read(), "utf-8")
             st.success(f"Successfully loaded file: {uploaded_file.name} ({len(source_text)} characters)")
             with st.expander("Preview extracted text"):
+                st.write(source_text[:1000] + "..." if len(source_text) > 1000 else source_text)
+else:
+    url_input = st.text_input("Enter YouTube Video Link or Blog Article URL:")
+    if url_input:
+        if st.button("Fetch Content from URL"):
+            with st.spinner("Extracting content from URL..."):
+                try:
+                    if "youtube.com" in url_input or "youtu.be" in url_input:
+                        source_text = extract_youtube_transcript(url_input)
+                    else:
+                        source_text = extract_web_article(url_input)
+                    st.success(f"Successfully extracted {len(source_text)} characters!")
+                except Exception as e:
+                    st.error(f"Error fetching URL content: {e}")
+        if source_text:
+            with st.expander("Preview extracted content"):
                 st.write(source_text[:1000] + "..." if len(source_text) > 1000 else source_text)
 
 st.subheader("2. Choose Output Format")
@@ -128,7 +172,7 @@ if st.button("✨ Repurpose Content", type="primary", use_container_width=True):
     if not api_key:
         st.error("Please provide a Groq API key in the sidebar or Streamlit Secrets!")
     elif not source_text.strip():
-        st.warning("Please provide or upload some content first!")
+        st.warning("Please provide, upload, or fetch some content first!")
     else:
         with st.spinner("Repurposing content with AI..."):
             try:
