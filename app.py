@@ -141,18 +141,26 @@ else:
             with st.expander("Preview extracted content"):
                 st.write(source_text[:1000] + "..." if len(source_text) > 1000 else source_text)
 
-st.subheader("2. Choose Output Format")
-format_choice = st.radio(
-    "Select what you want to convert this into:",
-    [
-        "🚀 Viral Twitter / X Thread (5-7 tweets with hooks)",
-        "💼 Engaging LinkedIn Post (Hook, value bullets, call to action)",
-        "📧 Engaging Email Newsletter (Subject line, body, takeaway)",
-        "💡 Actionable Bullet Summary (Key insights & main takeaways)",
-        "🎬 TikTok / Reel Video Script (Visual cues + voiceover)"
-    ],
-    index=0
-)
+st.subheader("2. Choose Output Format & Language")
+
+col1, col2 = st.columns(2)
+with col1:
+    format_choice = st.selectbox(
+        "Select Output Format:",
+        [
+            "🚀 Viral Twitter / X Thread (5-7 tweets with hooks)",
+            "💼 Engaging LinkedIn Post (Hook, value bullets, call to action)",
+            "📧 Engaging Email Newsletter (Subject line, body, takeaway)",
+            "💡 Actionable Bullet Summary (Key insights & main takeaways)",
+            "🎬 TikTok / Reel Video Script (Visual cues + voiceover)"
+        ]
+    )
+
+with col2:
+    language = st.selectbox(
+        "Select Output Language:",
+        ["English", "Roman Urdu", "Urdu"]
+    )
 
 tone = st.select_slider(
     "Select Tone of Voice:",
@@ -179,9 +187,10 @@ if st.button("✨ Repurpose Content", type="primary", use_container_width=True):
                 client = Groq(api_key=api_key)
                 system_instruction = f"""You are a world-class digital content strategist. 
 Tone: {tone}
+Language/Script: Write the final output strictly in {language}.
 Goal: {prompts[format_choice]}
 
-Ensure high quality, formatting, and zero fluff."""
+Ensure high quality, correct formatting, and zero fluff."""
 
                 response = client.chat.completions.create(
                     model=model,
