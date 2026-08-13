@@ -22,58 +22,51 @@ st.set_page_config(
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Advanced Professional CSS Styling
+# Professional Modern UI Styling
 st.markdown("""
 <style>
-    /* Main Background & Font */
+    /* App background */
     .stApp {
-        background-color: #F8FAFC;
+        background-color: #F4F6F9;
     }
     
-    /* Header Styling */
-    .main-title {
-        font-size: 2.7rem;
-        font-weight: 800;
-        color: #0F172A;
-        text-align: center;
-        margin-bottom: 0rem;
-        letter-spacing: -0.5px;
-    }
-    .sub-title {
-        font-size: 1.15rem;
-        color: #475569;
+    /* Header Container */
+    .hero-container {
+        background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+        padding: 2.5rem;
+        border-radius: 15px;
+        color: white;
         text-align: center;
         margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2);
     }
-
-    /* Card Containers */
-    .css-1r6slb0, .stExpander, div.stButton > button {
-        border-radius: 10px;
-    }
-
-    /* Primary Buttons */
-    div.stButton > button:first-child {
-        background-color: #2563EB;
+    .hero-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
         color: white;
-        font-weight: 600;
-        border: none;
-        padding: 0.6rem 1rem;
-        transition: all 0.3s ease;
     }
-    div.stButton > button:first-child:hover {
-        background-color: #1D4ED8;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    .hero-subtitle {
+        font-size: 1.2rem;
+        font-weight: 300;
+        color: #E2E8F0;
     }
 
-    /* Sidebar Styling */
-    sidebar-content {
-        background-color: #FFFFFF;
+    /* Card styling */
+    .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
     }
 </style>
-""", unsafe_allow_html=True)
 
-st.markdown('<div class="main-title">⚡ AI Content Repurposer Pro</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Transform 1 piece of content into 5+ high-performing formats in seconds.</div>', unsafe_allow_html=True)
+<div class="hero-container">
+    <div class="hero-title">⚡ AI Content Repurposer Pro</div>
+    <div class="hero-subtitle">Transform 1 piece of content into 5+ high-performing formats in seconds.</div>
+</div>
+""", unsafe_allow_html=True)
 
 # API Key Retrieval
 api_key = os.getenv("GROQ_API_KEY")
