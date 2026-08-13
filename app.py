@@ -141,7 +141,7 @@ else:
             with st.expander("Preview extracted content"):
                 st.write(source_text[:1000] + "..." if len(source_text) > 1000 else source_text)
 
-st.subheader("2. Choose Output Format & Language")
+st.subheader("2. Choose Output Format, Language & Custom Tone")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -162,10 +162,10 @@ with col2:
         ["English", "Roman Urdu", "Urdu"]
     )
 
-tone = st.select_slider(
-    "Select Tone of Voice:",
-    options=["Casual & Fun", "Conversational & Friendly", "Professional & Insightful", "Authoritative & Direct"],
-    value="Conversational & Friendly"
+# Custom Tone Input
+custom_tone = st.text_input(
+    "🎨 Custom Tone / Brand Voice (Optional):",
+    placeholder="e.g., Funny & Sarcastic, Investor Pitch Style, Storyteller, Motivation Guru"
 )
 
 prompts = {
@@ -185,8 +185,12 @@ if st.button("✨ Repurpose Content", type="primary", use_container_width=True):
         with st.spinner("Repurposing content with AI..."):
             try:
                 client = Groq(api_key=api_key)
+                
+                # Determine tone instruction
+                tone_instruction = f"Custom Brand Tone: {custom_tone}" if custom_tone else "Tone: Conversational & Friendly"
+                
                 system_instruction = f"""You are a world-class digital content strategist. 
-Tone: {tone}
+{tone_instruction}
 Language/Script: Write the final output strictly in {language}.
 Goal: {prompts[format_choice]}
 
