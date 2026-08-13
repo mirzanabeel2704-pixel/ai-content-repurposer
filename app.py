@@ -18,6 +18,10 @@ st.set_page_config(
     layout="wide"
 )
 
+# Initialize Session State for History
+if "history" not in st.session_state:
+    st.session_state.history = []
+
 # Custom Styling
 st.markdown("""
 <style>
@@ -48,7 +52,7 @@ if not api_key:
     except Exception:
         api_key = None
 
-# Sidebar
+# Sidebar Configuration & History Dashboard
 with st.sidebar:
     st.header("⚙️ Configuration")
     if not api_key:
@@ -62,6 +66,22 @@ with st.sidebar:
         ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"],
         index=0
     )
+    
+    st.divider()
+    st.header("📜 Generation History")
+    if len(st.session_state.history) == 0:
+        st.info("No history yet. Generate some content!")
+    else:
+        for idx, item in enumerate(reversed(st.session_state.history)):
+            with st.expander(f"{item['format']} ({idx+1})"):
+                st.write(item['output'][:300] + "...")
+                st.download_button(
+                    "📥 Download",
+                    item['output'],
+                    file_name=f"history_{idx}.txt",
+                    mime="text/plain",
+                    key=f"dl_{idx}"
+                )
 
 # Helper functions to extract content from different sources
 def extract_pdf(uploaded_file):
@@ -162,7 +182,6 @@ with col2:
         ["English", "Roman Urdu", "Urdu"]
     )
 
-# Custom Tone Input
 custom_tone = st.text_input(
     "🎨 Custom Tone / Brand Voice (Optional):",
     placeholder="e.g., Funny & Sarcastic, Investor Pitch Style, Storyteller, Motivation Guru"
@@ -185,8 +204,6 @@ if st.button("✨ Repurpose Content", type="primary", use_container_width=True):
         with st.spinner("Repurposing content with AI..."):
             try:
                 client = Groq(api_key=api_key)
-                
-                # Determine tone instruction
                 tone_instruction = f"Custom Brand Tone: {custom_tone}" if custom_tone else "Tone: Conversational & Friendly"
                 
                 system_instruction = f"""You are a world-class digital content strategist. 
@@ -207,6 +224,13 @@ Ensure high quality, correct formatting, and zero fluff."""
                 )
                 
                 result = response.choices[0].message.content
+                
+                # Save to History State
+                st.session_state.history.append({
+                    "format": format_choice.split(" ")[1],
+                    "output": result
+                })
+                
                 st.subheader("🎉 Repurposed Output")
                 st.markdown(result)
                 st.download_button("📥 Download Output", result, file_name="repurposed_content.txt", mime="text/plain")
