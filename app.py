@@ -22,7 +22,7 @@ st.set_page_config(
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Premium SaaS UI Styling
+# Premium SaaS UI Styling & Animations
 st.markdown("""
 <style>
     .stApp {
@@ -31,24 +31,23 @@ st.markdown("""
     
     /* Hero Banner */
     .hero-container {
-        background: linear-gradient(135deg, #0F172A 1E3A8A 100%);
         background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
-        padding: 2.5rem;
-        border-radius: 16px;
+        padding: 2.2rem;
+        border-radius: 14px;
         color: white;
         text-align: center;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
+        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.25);
     }
     .hero-title {
-        font-size: 2.8rem;
+        font-size: 2.5rem;
         font-weight: 800;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.3rem;
         color: white;
         letter-spacing: -0.5px;
     }
     .hero-subtitle {
-        font-size: 1.15rem;
+        font-size: 1.1rem;
         font-weight: 400;
         color: #E2E8F0;
     }
@@ -56,16 +55,16 @@ st.markdown("""
     /* Card Box Design */
     .saas-card {
         background: #ffffff;
-        padding: 2rem;
-        border-radius: 14px;
+        padding: 1.8rem;
+        border-radius: 12px;
         border: 1px solid #E2E8F0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
         margin-bottom: 1.5rem;
     }
 
     /* Section Headings inside Cards */
     .card-title {
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         font-weight: 700;
         color: #1E293B;
         margin-bottom: 1rem;
@@ -103,7 +102,7 @@ if not api_key:
     except Exception:
         api_key = None
 
-# Sidebar Configuration & History Dashboard
+# Sidebar Configuration, History & Professional Branding Footer
 with st.sidebar:
     st.header("⚙️ Configuration")
     if not api_key:
@@ -133,6 +132,15 @@ with st.sidebar:
                     mime="text/plain",
                     key=f"dl_{idx}"
                 )
+    
+    st.divider()
+    st.markdown(
+        "<div style='text-align: center; color: #64748B; font-size: 0.85rem;'>"
+        "Built with ❤️ by <b>Mirza Nabeel</b><br>"
+        "Powered by Groq & Streamlit"
+        "</div>", 
+        unsafe_allow_html=True
+    )
 
 # Helper functions to extract content from different sources
 def extract_pdf(uploaded_file):
@@ -187,7 +195,7 @@ if input_method == "✍️ Paste Text":
 elif input_method == "📁 Upload File":
     uploaded_file = st.file_uploader("Upload a document", type=["pdf", "docx", "txt"])
     if uploaded_file is not None:
-        with st.spinner("Reading file content..."):
+        with st.spinner("📁 Reading document contents securely..."):
             if uploaded_file.type == "application/pdf":
                 source_text = extract_pdf(uploaded_file)
             elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
@@ -201,7 +209,7 @@ else:
     url_input = st.text_input("Enter YouTube Video Link or Blog Article URL:")
     if url_input:
         if st.button("Fetch Content from URL"):
-            with st.spinner("Extracting content from URL..."):
+            with st.spinner("🔍 Extracting live transcript/article text..."):
                 try:
                     if "youtube.com" in url_input or "youtu.be" in url_input:
                         source_text = extract_youtube_transcript(url_input)
@@ -260,7 +268,7 @@ if st.button("✨ Repurpose Content", type="primary", use_container_width=True):
     elif not source_text.strip():
         st.warning("Please provide, upload, or fetch some content first!")
     else:
-        with st.spinner("🤖 Crafting your content with AI..."):
+        with st.spinner("🤖 Crafting high-performance content with AI..."):
             try:
                 client = Groq(api_key=api_key)
                 tone_instruction = f"Custom Brand Tone: {custom_tone}" if custom_tone else "Tone: Conversational & Friendly"
@@ -290,9 +298,11 @@ Ensure high quality, correct formatting, and zero fluff."""
                     "output": result
                 })
                 
+                st.markdown('<div class="saas-card">', unsafe_allow_html=True)
                 st.subheader("🎉 Repurposed Output")
                 st.markdown(result)
                 st.download_button("📥 Download Output", result, file_name="repurposed_content.txt", mime="text/plain")
+                st.markdown('</div>', unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Error generating content: {e}")
 
