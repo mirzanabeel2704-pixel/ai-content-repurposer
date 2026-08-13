@@ -22,43 +22,70 @@ st.set_page_config(
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Professional Modern UI Styling
+# Premium SaaS UI Styling
 st.markdown("""
 <style>
-    /* App background */
     .stApp {
-        background-color: #F4F6F9;
+        background-color: #F8FAFC;
     }
     
-    /* Header Container */
+    /* Hero Banner */
     .hero-container {
-        background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+        background: linear-gradient(135deg, #0F172A 1E3A8A 100%);
+        background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
         padding: 2.5rem;
-        border-radius: 15px;
+        border-radius: 16px;
         color: white;
         text-align: center;
         margin-bottom: 2rem;
-        box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2);
+        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
     }
     .hero-title {
         font-size: 2.8rem;
         font-weight: 800;
         margin-bottom: 0.5rem;
         color: white;
+        letter-spacing: -0.5px;
     }
     .hero-subtitle {
-        font-size: 1.2rem;
-        font-weight: 300;
+        font-size: 1.15rem;
+        font-weight: 400;
         color: #E2E8F0;
     }
 
-    /* Card styling */
-    .card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    /* Card Box Design */
+    .saas-card {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 14px;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         margin-bottom: 1.5rem;
+    }
+
+    /* Section Headings inside Cards */
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1E293B;
+        margin-bottom: 1rem;
+    }
+
+    /* Custom Button Styling */
+    div.stButton > button:first-child {
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        color: white;
+        font-weight: 600;
+        font-size: 1.05rem;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+    div.stButton > button:first-child:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
     }
 </style>
 
@@ -138,13 +165,15 @@ def extract_web_article(url):
     paragraphs = soup.find_all("p")
     return "\n".join([p.get_text() for p in paragraphs])
 
-# Main UI - Input Section
-st.subheader("1. Input Your Source Content")
+# Main UI wrapped in Clean SaaS Cards
+st.markdown('<div class="saas-card">', unsafe_allow_html=True)
+st.markdown('<div class="card-title">1. Input Your Source Content</div>', unsafe_allow_html=True)
 
 input_method = st.radio(
     "Choose input method:",
     ["✍️ Paste Text", "📁 Upload File", "🔗 YouTube / Blog URL"],
-    horizontal=True
+    horizontal=True,
+    label_visibility="collapsed"
 )
 
 source_text = ""
@@ -185,7 +214,11 @@ else:
             with st.expander("Preview extracted content"):
                 st.write(source_text[:1000] + "..." if len(source_text) > 1000 else source_text)
 
-st.subheader("2. Choose Output Format, Language & Custom Tone")
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Card 2: Options & Configurations
+st.markdown('<div class="saas-card">', unsafe_allow_html=True)
+st.markdown('<div class="card-title">2. Choose Output Format, Language & Custom Tone</div>', unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 with col1:
@@ -218,6 +251,8 @@ prompts = {
     "💡 Actionable Bullet Summary (Key insights & main takeaways)": "Distill the input into a crisp executive summary with bullet points highlighting only the top actionable insights.",
     "🎬 TikTok / Reel Video Script (Visual cues + voiceover)": "Create a 60-second video script for TikTok/Reels/Shorts based on this content. Include visual direction tags like [Visual] and spoken dialogue tags like [Voiceover]."
 }
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 if st.button("✨ Repurpose Content", type="primary", use_container_width=True):
     if not api_key:
@@ -260,3 +295,5 @@ Ensure high quality, correct formatting, and zero fluff."""
                 st.download_button("📥 Download Output", result, file_name="repurposed_content.txt", mime="text/plain")
             except Exception as e:
                 st.error(f"Error generating content: {e}")
+
+st.markdown('</div>', unsafe_allow_html=True)
