@@ -22,21 +22,52 @@ st.set_page_config(
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Custom Styling
+# Advanced Professional CSS Styling
 st.markdown("""
 <style>
+    /* Main Background & Font */
+    .stApp {
+        background-color: #F8FAFC;
+    }
+    
+    /* Header Styling */
     .main-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #1E3A8A;
+        font-size: 2.7rem;
+        font-weight: 800;
+        color: #0F172A;
         text-align: center;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0rem;
+        letter-spacing: -0.5px;
     }
     .sub-title {
-        font-size: 1.1rem;
-        color: #4B5563;
+        font-size: 1.15rem;
+        color: #475569;
         text-align: center;
         margin-bottom: 2rem;
+    }
+
+    /* Card Containers */
+    .css-1r6slb0, .stExpander, div.stButton > button {
+        border-radius: 10px;
+    }
+
+    /* Primary Buttons */
+    div.stButton > button:first-child {
+        background-color: #2563EB;
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 0.6rem 1rem;
+        transition: all 0.3s ease;
+    }
+    div.stButton > button:first-child:hover {
+        background-color: #1D4ED8;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    /* Sidebar Styling */
+    sidebar-content {
+        background-color: #FFFFFF;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -201,7 +232,7 @@ if st.button("✨ Repurpose Content", type="primary", use_container_width=True):
     elif not source_text.strip():
         st.warning("Please provide, upload, or fetch some content first!")
     else:
-        with st.spinner("Repurposing content with AI..."):
+        with st.spinner("🤖 Crafting your content with AI..."):
             try:
                 client = Groq(api_key=api_key)
                 tone_instruction = f"Custom Brand Tone: {custom_tone}" if custom_tone else "Tone: Conversational & Friendly"
