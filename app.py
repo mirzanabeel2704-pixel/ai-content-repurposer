@@ -8,7 +8,6 @@ from pypdf import PdfReader
 from docx import Document
 from youtube_transcript_api import YouTubeTranscriptApi
 from bs4 import BeautifulSoup
-from streamlit_copy_to_clipboard import copy_to_clipboard
 
 load_dotenv()
 
@@ -197,13 +196,6 @@ Ensure high quality, formatting, and zero fluff."""
                 result = response.choices[0].message.content
                 st.subheader("🎉 Repurposed Output")
                 st.markdown(result)
-                
-                # Action Buttons (Copy & Download)
-                col1, col2 = st.columns(2)
-                with col1:
-                    copy_to_clipboard(text=result, label="📋 Copy to Clipboard", copied_label="✅ Copied!")
-                with col2:
-                    st.download_button("📥 Download Output", result, file_name="repurposed_content.txt", mime="text/plain")
-
+                st.download_button("📥 Download Output", result, file_name="repurposed_content.txt", mime="text/plain")
             except Exception as e:
                 st.error(f"Error generating content: {e}")
