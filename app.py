@@ -2,6 +2,8 @@ import os
 import streamlit as st
 from groq import Groq
 from dotenv import load_dotenv
+from pypdf import PdfReader
+from docx import Document
 
 load_dotenv()
 
@@ -57,13 +59,43 @@ with st.sidebar:
         index=0
     )
 
-# Main UI
+# Function to extract text from uploaded files
+def extract_text(uploaded_file):
+    text = ""
+    if uploaded_file.type == "application/pdf":
+        reader = PdfReader(uploaded_file)
+        for page in reader.pages:
+            if page.extract_text():
+                text += page.extract_text() + "\n"
+    elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        doc = Document(uploaded_file)
+        for para in doc.paragraphs:
+            text += para.text + "\n"
+    elif uploaded_file.type == "text/plain":
+        text = str(uploaded_file.read(), "utf-8")
+    return text
+
+# Main UI - Input Section
 st.subheader("1. Input Your Source Content")
-source_text = st.text_area(
-    "Paste your raw notes, article, video script, or blog post here:",
-    height=200,
-    placeholder="Paste your content here..."
-)
+
+input_method = st.radio("Choose input method:", ["✍️ Paste Text", "📁 Upload File (PDF, Word, TXT)"], horizontal=True)
+
+source_text = ""
+
+if input_method == "✍️ Paste Text":
+    source_text = st.text_area(
+        "Paste your raw notes, article, video script, or blog post here:",
+        height=200,
+        placeholder="Paste your content here..."
+    )
+else:
+    uploaded_file = st.file_uploader("Upload a document", type=["pdf", "docx", "txt"])
+    if uploaded_file is not None:
+        with st.spinner("Reading file content..."):
+            source_text = extract_text(uploaded_file)
+            st.success(f"Successfully loaded file: {uploaded_file.name} ({len(source_text)} characters)")
+            with st.expander("Preview extracted text"):
+                st.write(source_text[:1000] + "..." if len(source_text) > 1000 else source_text)
 
 st.subheader("2. Choose Output Format")
 format_choice = st.radio(
@@ -96,7 +128,7 @@ if st.button("✨ Repurpose Content", type="primary", use_container_width=True):
     if not api_key:
         st.error("Please provide a Groq API key in the sidebar or Streamlit Secrets!")
     elif not source_text.strip():
-        st.warning("Please paste some content first!")
+        st.warning("Please provide or upload some content first!")
     else:
         with st.spinner("Repurposing content with AI..."):
             try:
