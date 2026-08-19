@@ -110,12 +110,12 @@ with st.sidebar:
         st.info("Get your free key from [console.groq.com](https://console.groq.com)")
     else:
         st.success("API Key Loaded Successfully! ✅")
-
-   model = st.selectbox(
-    "Select Model",
-    ["llama-3.1-8b-instant", "mixtral-8x7b-32768"],
-    index=0
-    )
+    
+    model = st.selectbox(
+"Select Model",
+["llama-3.1-8b-instant", "mixtral-8x7b-32768"],
+index=0
+)
     
     st.divider()
     st.header("📜 Generation History")
