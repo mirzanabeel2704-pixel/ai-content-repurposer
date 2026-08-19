@@ -111,10 +111,11 @@ with st.sidebar:
     else:
         st.success("API Key Loaded Successfully! ✅")
 
-    model = st.selectbox(
-        "Select Model",
-        ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"],
-        index=0
+   model = st.selectbox(
+    "Select Model",
+    ["llama-3.1-8b-instant", "mixtral-8x7b-32768"],
+    index=0
+)
     )
     
     st.divider()
