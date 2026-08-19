@@ -109,12 +109,12 @@ with st.sidebar:
         api_key = st.text_input("Enter Groq API Key", type="password")
         st.info("Get your free key from [console.groq.com](https://console.groq.com)")
     else:
-        st.success("API Key Loaded Successfully! ✅")
-       model = st.selectbox(
-"Select Model",
-["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.6-27b"],
-index=0
-)
+    st.success("API Key Loaded Successfully! ✅")
+model = st.selectbox(
+ "Select Model",
+ ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.6-27b"],
+ index=0
+ )
     
     st.divider()
     st.header("📜 Generation History")
